@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Odds Altas — Descubra seu grupo VIP | Lucas Tylty</title>
+<meta name="description" content="Faça o quiz e descubra qual grupo de Odds Altas do Lucas Tylty combina com o seu perfil de apostador. 7 perguntas, resultado personalizado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060d08;
+    --bg2: #0c1810;
+    --bg3: #111f14;
+    --green: #1ef26a;
+    --green-dim: #0fa841;
+    --green-glow: rgba(30, 242, 106, 0.15);
+    --gold: #f0c832;
+    --gold-dim: #c9a71a;
+    --red: #ff3b30;
+    --text: #e8f5ea;
+    --text-dim: #7aad84;
+    --border: rgba(30, 242, 106, 0.18);
+    --card: rgba(12, 24, 16, 0.9);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ── GRID BG ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(30,242,106,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,242,106,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── TICKER ── */
+  .ticker {
+    width: 100%;
+    background: var(--green);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    padding: 6px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: scroll-left 30s linear infinite;
+  }
+  .ticker-inner span { margin: 0 40px; }
+  @keyframes scroll-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── HEADER ── */
+  header {
+    width: 100%;
+    max-width: 680px;
+    padding: 48px 24px 0;
+    text-align: center;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-glow);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .logo-badge::before {
+    content: '●';
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .main-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 88px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .main-title .hl {
+    color: var(--green);
+    text-shadow: 0 0 40px rgba(30,242,106,0.4);
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin: 20px auto 0;
+    max-width: 440px;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 36px 0;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* ── QUIZ CONTAINER ── */
+  .quiz-wrap {
+    width: 100%;
+    max-width: 680px;
+    padding: 0 24px 80px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-area {
+    margin-bottom: 32px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-dim), var(--green));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 12px rgba(30,242,106,0.5);
+  }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+    animation: slide-up 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .q-text {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: transparent;
+    border: 1px solid rgba(30,242,106,0.15);
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--green-glow);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .option-btn:hover::before { opacity: 1; }
+  .option-btn:hover {
+    border-color: var(--green);
+    transform: translateX(4px);
+  }
+  .option-btn.selected {
+    border-color: var(--green);
+    background: var(--green-glow);
+    color: var(--green);
+  }
+  .option-btn.selected .opt-letter {
+    background: var(--green);
+    color: var(--bg);
+  }
+
+  .opt-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .next-btn {
+    margin-top: 24px;
+    width: 100%;
+    padding: 18px;
+    background: var(--green);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: none;
+  }
+  .next-btn.visible { display: block; animation: fade-in 0.3s ease; }
+  .next-btn:hover {
+    background: #2fff7d;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(30,242,106,0.35);
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── LOADING ── */
+  #loading-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+  }
+  .loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--bg3);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 24px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+  .loading-steps { margin-top: 32px; display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    font-size: 13px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 0.4s, color 0.4s;
+  }
+  .step.done { opacity: 1; color: var(--green); }
+  .step-icon { font-size: 16px; }
+
+  /* ── RESULT SCREEN ── */
+  #result-screen {
+    display: none;
+    animation: slide-up 0.5s ease;
+  }
+
+  .result-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .result-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .result-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 8vw, 68px);
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .result-group-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 7vw, 60px);
+    color: var(--green);
+    text-shadow: 0 0 40px rgba(30,242,106,0.5);
+    line-height: 1;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green-dim), var(--green), var(--gold));
+  }
+
+  .result-desc {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+  .result-desc strong { color: var(--text); }
+
+  .features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .feature-icon {
+    color: var(--green);
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .cta-section { text-align: center; margin-top: 32px; }
+
+  .cta-btn {
+    display: inline-block;
+    width: 100%;
+    padding: 20px 32px;
+    background: linear-gradient(135deg, var(--green-dim), var(--green));
+    color: var(--bg);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 0 rgba(30,242,106,0);
+    margin-bottom: 14px;
+  }
+  .cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(30,242,106,0.4);
+  }
+
+  .cta-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .score-display {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .score-pill {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+  }
+  .score-pill-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--green);
+    line-height: 1;
+  }
+  .score-pill-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .redo-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 10px;
+    padding: 14px 24px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .redo-btn:hover { border-color: var(--green); color: var(--text); }
+
+  /* ── INTRO SCREEN ── */
+  #intro-screen { text-align: center; }
+
+  .intro-cta {
+    margin-top: 40px;
+    width: 100%;
+    padding: 20px;
+    background: var(--green);
+    color: var(--bg);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .intro-cta:hover {
+    background: #2fff7d;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(30,242,106,0.4);
+  }
+  .intro-note {
+    margin-top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* ── PROFILES PREVIEW ── */
+  .groups-preview {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .group-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    filter: blur(3px);
+    user-select: none;
+  }
+  .group-chip span { color: var(--green); }
+
+  @media (max-width: 480px) {
+    .question-card { padding: 24px 20px; }
+    .q-text { font-size: 18px; }
+    .result-card { padding: 24px 20px; }
+    header { padding-top: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>🔥 ODDS ALTAS</span>
+    <span>⚽ MAIS DE 15.000 MEMBROS</span>
+    <span>📊 ANÁLISE PROFISSIONAL</span>
+    <span>💰 RESULTADOS REAIS</span>
+    <span>🎯 ENTRADAS EXCLUSIVAS</span>
+    <span>🔥 GRUPO VIP</span>
+    <span>⚽ LUCAS TYLTY</span>
+    <span>📊 TIPSTER VERIFICADO</span>
+    <span>💰 ODDS ALTAS</span>
+    <span>🎯 ENTRADAS EXCLUSIVAS</span>
+    <span>🔥 ODDS ALTAS</span>
+    <span>⚽ MAIS DE 15.000 MEMBROS</span>
+    <span>📊 ANÁLISE PROFISSIONAL</span>
+    <span>💰 RESULTADOS REAIS</span>
+    <span>🎯 ENTRADAS EXCLUSIVAS</span>
+    <span>🔥 GRUPO VIP</span>
+    <span>⚽ LUCAS TYLTY</span>
+    <span>📊 TIPSTER VERIFICADO</span>
+    <span>💰 ODDS ALTAS</span>
+    <span>🎯 ENTRADAS EXCLUSIVAS</span>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="logo-badge">Lucas Tylty · Odds Altas</div>
+    <h1 class="main-title">QUAL GRUPO<br><span class="hl">VIP É</span><br>SEU?</h1>
+    <p class="subtitle">Responda 7 perguntas rápidas e descubra qual grupo de Odds Altas combina com o seu perfil de apostador.</p>
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Perguntas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">+15K</div>
+        <div class="stat-label">Membros</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Grupos VIP</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2min</div>
+        <div class="stat-label">Para fazer</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="quiz-wrap">
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen">
+      <button class="intro-cta" onclick="startQuiz()">DESCOBRIR MEU GRUPO →</button>
+      <p class="intro-note">⚡ Quiz rápido · gratuito · resultado personalizado</p>
+      <div class="groups-preview">
+        <div class="group-chip"><span>🥇</span> Grupo Premium</div>
+        <div class="group-chip"><span>🔥</span> Grupo Iniciante</div>
+        <div class="group-chip"><span>💎</span> Grupo Elite</div>
+      </div>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" style="display:none">
+      <div class="progress-area">
+        <div class="progress-meta">
+          <span id="prog-text">Pergunta 1 de 7</span>
+          <span id="prog-pct">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="question-card" id="q-card">
+        <div class="q-number" id="q-num">PERGUNTA 01</div>
+        <div class="q-text" id="q-text"></div>
+        <div class="options-grid" id="options"></div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">PRÓXIMA →</button>
+      </div>
+    </div>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">ANALISANDO SEU PERFIL...</div>
+      <div class="loading-steps">
+        <div class="step" id="step1"><span class="step-icon">📊</span> Calculando seu perfil apostador</div>
+        <div class="step" id="step2"><span class="step-icon">🔍</span> Identificando seu estilo de jogo</div>
+        <div class="step" id="step3"><span class="step-icon">🎯</span> Encontrando o grupo ideal</div>
+        <div class="step" id="step4"><span class="step-icon">✅</span> Resultado pronto!</div>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen">
+      <div class="result-header">
+        <div class="result-badge">✦ SEU RESULTADO</div>
+        <div class="result-title">SEU GRUPO É O</div>
+        <div class="result-group-name" id="res-name">—</div>
+      </div>
+
+      <div class="result-card">
+        <div class="score-display" id="score-display"></div>
+        <div class="result-desc" id="res-desc"></div>
+        <div class="features-list" id="res-features"></div>
+      </div>
+
+      <div class="cta-section">
+        <a href="#" class="cta-btn" id="cta-link">QUERO ENTRAR NO GRUPO →</a>
+        <p class="cta-sub">🔒 Acesso imediato · Vagas limitadas</p>
+      </div>
+
+      <div style="margin-top: 16px">
+        <button class="redo-btn" onclick="restartQuiz()">↺ Refazer o quiz</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "Qual é a sua experiência com apostas esportivas?",
+    options: [
+      { text: "Sou iniciante, comecei há pouco tempo", value: "iniciante" },
+      { text: "Aposto há alguns meses, ainda aprendendo", value: "medio" },
+      { text: "Tenho mais de 1 ano de experiência", value: "avancado" },
+      { text: "Aposto profissionalmente há anos", value: "elite" }
+    ]
+  },
+  {
+    text: "Quanto você costuma apostar por entrada, em média?",
+    options: [
+      { text: "Até R$ 20 por entrada", value: "iniciante" },
+      { text: "Entre R$ 20 e R$ 50", value: "medio" },
+      { text: "Entre R$ 50 e R$ 200", value: "avancado" },
+      { text: "Acima de R$ 200", value: "elite" }
+    ]
+  },
+  {
+    text: "O que você mais valoriza em um grupo de apostas?",
+    options: [
+      { text: "Explicações detalhadas de cada entrada", value: "iniciante" },
+      { text: "Equilíbrio entre educação e entradas", value: "medio" },
+      { text: "Entradas diretas com bom volume", value: "avancado" },
+      { text: "Análises técnicas avançadas e odds altas", value: "elite" }
+    ]
+  },
+  {
+    text: "Como você reage quando uma entrada cai?",
+    options: [
+      { text: "Fico frustrado e quero entender o que deu errado", value: "iniciante" },
+      { text: "Aceito faz parte, mas ainda me afeta", value: "medio" },
+      { text: "Encaro como parte do processo normal", value: "avancado" },
+      { text: "É só mais uma jogada dentro da estratégia", value: "elite" }
+    ]
+  },
+  {
+    text: "Qual tipo de aposta você prefere?",
+    options: [
+      { text: "Simples, com odds entre 1.5 e 2.0", value: "iniciante" },
+      { text: "Mistas ou duplas, segurança média", value: "medio" },
+      { text: "Odds entre 2.0 e 5.0, risco calculado", value: "avancado" },
+      { text: "Odds altas acima de 5.0 com análise", value: "elite" }
+    ]
+  },
+  {
+    text: "Com que frequência você quer receber entradas?",
+    options: [
+      { text: "Poucas por semana, para analisar bem cada uma", value: "iniciante" },
+      { text: "De 3 a 5 por semana", value: "medio" },
+      { text: "Diariamente, com bom volume", value: "avancado" },
+      { text: "Múltiplas por dia, quero aproveitar cada oportunidade", value: "elite" }
+    ]
+  },
+  {
+    text: "Qual é o seu objetivo principal nas apostas?",
+    options: [
+      { text: "Diversão e aprender como funciona", value: "iniciante" },
+      { text: "Complementar minha renda mensal", value: "medio" },
+      { text: "Ter uma fonte de renda consistente", value: "avancado" },
+      { text: "Maximizar lucros com alto volume", value: "elite" }
+    ]
+  }
+];
+
+const RESULTS = {
+  iniciante: {
+    name: "ODDS ALTAS INICIANTE",
+    desc: "Você está dando os <strong>primeiros passos no mundo das apostas</strong> e o grupo Iniciante foi feito exatamente para isso. Aqui você vai aprender a base, entender cada entrada com calma e construir uma banca sólida com entradas mais conservadoras e acompanhamento passo a passo.",
+    features: [
+      "Entradas explicadas didaticamente",
+      "Gerenciamento de banca para iniciantes",
+      "Odds entre 1.5 e 3.0 (menor risco)",
+      "Suporte e tira-dúvidas constante",
+      "Conteúdo educativo semanal",
+    ],
+    score: { perfil: "Iniciante", entradas: "3–5/sem", odds: "1.5–3.0" },
+    cta: "#"
+  },
+  medio: {
+    name: "ODDS ALTAS PREMIUM",
+    desc: "Você já tem uma noção do mercado e quer <strong>dar o próximo passo</strong>. O grupo Premium equilibra educação com entradas de qualidade, volume moderado e uma comunidade que cresce junto. Ideal pra quem quer aprender jogando.",
+    features: [
+      "Volume médio de entradas diárias",
+      "Análise de cada entrada com contexto",
+      "Odds variadas entre 2.0 e 6.0",
+      "Lives e análises exclusivas",
+      "Comunidade ativa e engajada",
+    ],
+    score: { perfil: "Intermediário", entradas: "5–10/sem", odds: "2.0–6.0" },
+    cta: "#"
+  },
+  avancado: {
+    name: "ODDS ALTAS ELITE",
+    desc: "Você pensa em apostas de forma <strong>estratégica e profissional</strong>. O grupo Elite é para apostadores sérios que querem alto volume, odds que valem a pena e análises que vão fundo no jogo. Resultados consistentes para quem sabe o que quer.",
+    features: [
+      "Alto volume de entradas diárias",
+      "Odds altas selecionadas com critério",
+      "Análises técnicas detalhadas",
+      "Acesso a mercados exclusivos",
+      "Histórico e ROI transparente",
+    ],
+    score: { perfil: "Avançado", entradas: "10+/sem", odds: "3.0–15.0" },
+    cta: "#"
+  },
+  elite: {
+    name: "ODDS ALTAS ELITE",
+    desc: "Você pensa em apostas de forma <strong>estratégica e profissional</strong>. O grupo Elite é para apostadores sérios que querem alto volume, odds que valem a pena e análises que vão fundo no jogo. Resultados consistentes para quem sabe o que quer.",
+    features: [
+      "Alto volume de entradas diárias",
+      "Odds altas selecionadas com critério",
+      "Análises técnicas detalhadas",
+      "Acesso a mercados exclusivos",
+      "Histórico e ROI transparente",
+    ],
+    score: { perfil: "Profissional", entradas: "15+/sem", odds: "5.0–20.0+" },
+    cta: "#"
+  }
+};
+
+let currentQ = 0;
+let answers = [];
+let selected = null;
+
+function startQuiz() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  selected = null;
+
+  document.getElementById('q-num').textContent = `PERGUNTA ${String(currentQ + 1).padStart(2,'0')}`;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('prog-text').textContent = `Pergunta ${currentQ + 1} de ${QUESTIONS.length}`;
+  const pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.options.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${o.text}`;
+    btn.onclick = () => selectOption(btn, o.value);
+    opts.appendChild(btn);
+  });
+
+  const next = document.getElementById('next-btn');
+  next.classList.remove('visible');
+  next.textContent = currentQ === QUESTIONS.length - 1 ? 'VER MEU RESULTADO →' : 'PRÓXIMA →';
+
+  // re-animate card
+  const card = document.getElementById('q-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = '';
+}
+
+function selectOption(btn, value) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selected = value;
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function nextQuestion() {
+  if (!selected) return;
+  answers.push(selected);
+
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showLoading();
+  }
+}
+
+function showLoading() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  const ls = document.getElementById('loading-screen');
+  ls.style.display = 'block';
+
+  const steps = ['step1','step2','step3','step4'];
+  steps.forEach((s, i) => {
+    setTimeout(() => {
+      document.getElementById(s).classList.add('done');
+    }, 600 + i * 700);
+  });
+
+  setTimeout(() => {
+    ls.style.display = 'none';
+    showResult();
+  }, 3400);
+}
+
+function showResult() {
+  // tally votes
+  const counts = {};
+  answers.forEach(a => { counts[a] = (counts[a] || 0) + 1; });
+  const winner = Object.entries(counts).sort((a,b) => b[1]-a[1])[0][0];
+  const result = RESULTS[winner];
+
+  document.getElementById('res-name').textContent = result.name;
+  document.getElementById('res-desc').innerHTML = result.desc;
+
+  const sc = result.score;
+  document.getElementById('score-display').innerHTML = `
+    <div class="score-pill">
+      <div class="score-pill-num">${sc.perfil}</div>
+      <div class="score-pill-label">Perfil</div>
+    </div>
+    <div class="score-pill">
+      <div class="score-pill-num">${sc.entradas}</div>
+      <div class="score-pill-label">Entradas</div>
+    </div>
+    <div class="score-pill">
+      <div class="score-pill-num">${sc.odds}</div>
+      <div class="score-pill-label">Odds</div>
+    </div>
+  `;
+
+  const feats = document.getElementById('res-features');
+  feats.innerHTML = result.features.map(f =>
+    `<div class="feature-item"><span class="feature-icon">✦</span>${f}</div>`
+  ).join('');
+
+  document.getElementById('cta-link').href = result.cta;
+
+  document.getElementById('result-screen').style.display = 'block';
+
+  // update progress
+  document.querySelector('.progress-fill').style.width = '100%';
+  document.getElementById('prog-pct').textContent = '100%';
+  document.getElementById('prog-text').textContent = 'Concluído!';
+}
+
+function restartQuiz() {
+  currentQ = 0;
+  answers = [];
+  selected = null;
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQuestion();
+}
+</script>
+</body>
+</html>
